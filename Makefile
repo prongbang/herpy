@@ -1,4 +1,5 @@
 # Reference: https://betterprogramming.pub/building-an-api-gateway-in-rust-with-hyper-c84aaf549443
+# Badge: https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/adding-a-workflow-status-badge
 
 get_users:
 	curl --location 'http://localhost:8080/users' \
