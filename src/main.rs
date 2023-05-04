@@ -1,8 +1,7 @@
 use hyper::service::{make_service_fn, service_fn};
-use hyper::{Body, Request, Response, Server};
-use reqwest::header::{HeaderMap, AUTHORIZATION};
+use hyper::{Server};
 use std::net::SocketAddr;
-use herpy::config::config::{GatewayConfig, load_config, ServiceConfig};
+use herpy::config::config::{GatewayConfig, load_config};
 use herpy::gateway;
 
 #[tokio::main]
