@@ -1,0 +1,13 @@
+[package]
+name = "herpy"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.159", features = ["derive"] }
+serde_yaml = "0.9.19"
+tokio = { version = "1.16.1", features = ["full"] }
+hyper = { version = "0.14.10", features = ["full"] }
+reqwest = { version = "0.11", features = ["json"] }

@@ -1,0 +1,9 @@
+---
+authorization_api_url: "https://jsonplaceholder.typicode.com/posts/1"
+services:
+  - path: "/users"
+    target_service: "http://jsonplaceholder.typicode.com/users"
+    target_port: "80"
+  - path: "/orders"
+    target_service: "http://jsonplaceholder.typicode.com/posts"
+    target_port: "80"
