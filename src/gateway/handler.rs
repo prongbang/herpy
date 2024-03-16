@@ -1,109 +1,27 @@
-use hyper::header::HeaderValue;
-use hyper::http::request::Parts;
-use hyper::{Body, Client, HeaderMap, Request, Response};
-use hyper::header::AUTHORIZATION;
-use crate::config::config::{Backend, GatewayConfig, Service};
+use hyper::{Body, Request, Response};
+
+use crate::{forwarder, response};
+use crate::config::config::GatewayConfig;
 
 pub async fn request(
     req: Request<Body>,
     config: GatewayConfig,
 ) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path();
-    let service_config = match get_service_config(path, &config.services) {
-        Some(service_config) => service_config,
-        None => {
-            return not_found();
+
+    if let Some(service_map) = &config.services_map {
+        if let Some(service) = service_map.get(path) {
+            let (parts, body) = req.into_parts();
+            for backend in &service.backends {
+                return match forwarder::hyper::forward(parts, body, &backend).await {
+                    Ok(res) => Ok(res),
+                    Err(_) => response::service_unavailable("Failed to connect to downstream service"),
+                };
+            }
         }
-    };
-
-    // let auth_token = match authorize_user(&req.headers(), &config.authorization_api_url).await {
-    //     Ok(header) => header,
-    //     Err(_) => {
-    //         return service_unavailable("Failed to connect to Authorization API {}");
-    //     }
-    // };
-
-    let backend = service_config.backends.first().unwrap();
-
-    let (parts, body) = req.into_parts();
-    let downstream_req = build_downstream_request(parts, body, &backend, "auth_token".to_string()).await?;
-
-    match forward_request(downstream_req).await {
-        Ok(res) => Ok(res),
-        Err(_) => service_unavailable("Failed to connect to downstream service"),
     }
-}
 
-fn get_service_config<'a>(path: &str, services: &'a [Service]) -> Option<&'a Service> {
-    services.iter().find(|c| path.starts_with(&c.endpoint))
-}
-
-async fn authorize_user(headers: &HeaderMap, auth_api_url: &str) -> Result<String, ()> {
-    let auth_header_value = match headers.get(AUTHORIZATION) {
-        Some(value) => value.to_str().unwrap_or_default(),
-        None => "",
-    };
-
-    let auth_request = reqwest::Client::new()
-        .get(auth_api_url)
-        .header(AUTHORIZATION, auth_header_value);
-
-    println!("{}", auth_api_url);
-
-    match auth_request.send().await {
-        Ok(res) if res.status().is_success() => Ok(auth_header_value.to_string()),
-        _ => Err(()),
-    }
-}
-
-async fn build_downstream_request(
-    parts: Parts,
-    body: Body,
-    backend: &Backend,
-    auth_token: String,
-) -> Result<Request<Body>, hyper::Error> {
-    let req = Request::from_parts(parts, body);
-    let uri = format!("{}{}", backend.host, backend.path);
-
-    let mut downstream_req_builder = Request::builder()
-        .uri(uri)
-        .method(req.method())
-        .version(req.version());
-
-    *downstream_req_builder.headers_mut().unwrap() = req.headers().clone();
-
-    downstream_req_builder
-        .headers_mut()
-        .unwrap()
-        .insert("Authorization", HeaderValue::from_str(&auth_token).unwrap());
-
-    let body_bytes = hyper::body::to_bytes(req.into_body()).await?;
-
-    let downstream_req = downstream_req_builder.body(Body::from(body_bytes));
-
-    Ok(downstream_req.unwrap())
-}
-
-async fn forward_request(req: Request<Body>) -> Result<Response<Body>, ()> {
-    match Client::new().request(req).await {
-        Ok(res) => Ok(res),
-        Err(_) => Err(()),
-    }
-}
-
-fn not_found() -> Result<Response<Body>, hyper::Error> {
-    let mut response = Response::new(Body::from("404 Not Found"));
-    *response.status_mut() = hyper::StatusCode::NOT_FOUND;
-    Ok(response)
-}
-
-fn service_unavailable<T>(reason: T) -> Result<Response<Body>, hyper::Error>
-    where
-        T: Into<Body>,
-{
-    let mut response = Response::new(reason.into());
-    *response.status_mut() = hyper::StatusCode::SERVICE_UNAVAILABLE;
-    Ok(response)
+    return response::not_found();
 }
 
 // #[cfg(test)]
