@@ -34,3 +34,7 @@ get_users:
 get_orders:
 	curl --location 'http://localhost:8080/orders' \
     --header 'Authorization: Bearer JWT'
+
+get_hello:
+	curl -X POST --location 'http://localhost:8080/hello' \
+    --header 'Authorization: Bearer JWT'

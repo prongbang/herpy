@@ -6,7 +6,7 @@ use herpy::gateway;
 
 #[tokio::main]
 async fn main() {
-    let config: GatewayConfig = load_config("config.yaml");
+    let config: GatewayConfig = load_config("herpy.yaml");
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
 
@@ -16,7 +16,7 @@ async fn main() {
         async {
             Ok::<_, hyper::Error>(service_fn(move |req| {
                 let config: GatewayConfig = config.clone();
-                gateway::handler::handle_request(req, config)
+                gateway::handler::request(req, config)
             }))
         }
     });
