@@ -3,15 +3,13 @@ use hyper::{Body, Request, Response};
 
 use crate::{forwarder};
 use crate::config::config::GatewayConfig;
-use std::net::SocketAddr;
 
 pub async fn request(
     config: GatewayConfig,
-    addr: SocketAddr,
     req: Request<Body>,
 ) -> Result<Response<Body>, Infallible> {
-    let res = handle_inner(config, addr, req).await.unwrap_or_else(|err| {
-        //tracing::error!(error = format!("{err:#?}"), "could not process request");
+    let res = handle_inner(config, req).await.unwrap_or_else(|err| {
+        tracing::error!(error = format!("{err:#?}"), "could not process request");
 
         hyper::Response::builder()
             .status(hyper::StatusCode::INTERNAL_SERVER_ERROR)
@@ -24,7 +22,6 @@ pub async fn request(
 
 async fn handle_inner(
     config: GatewayConfig,
-    addr: SocketAddr,
     req: Request<Body>,
 ) -> Result<Response<Body>, anyhow::Error> {
     let path = req.uri().path();
@@ -53,13 +50,6 @@ async fn handle_inner(
         .unwrap();
 
     Ok(response)
-
-    // let (parts, body) = req.into_parts();
-    // context
-    //     .runner
-    //     .handle(addr, parts, body)
-    //     .await
-    //     .context("JavaScript failed")
 }
 
 // #[cfg(test)]
