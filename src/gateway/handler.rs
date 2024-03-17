@@ -1,12 +1,32 @@
+use std::convert::Infallible;
 use hyper::{Body, Request, Response};
 
-use crate::{forwarder, response};
+use crate::{forwarder};
 use crate::config::config::GatewayConfig;
+use std::net::SocketAddr;
 
 pub async fn request(
-    req: Request<Body>,
     config: GatewayConfig,
-) -> Result<Response<Body>, hyper::Error> {
+    addr: SocketAddr,
+    req: Request<Body>,
+) -> Result<Response<Body>, Infallible> {
+    let res = handle_inner(config, addr, req).await.unwrap_or_else(|err| {
+        //tracing::error!(error = format!("{err:#?}"), "could not process request");
+
+        hyper::Response::builder()
+            .status(hyper::StatusCode::INTERNAL_SERVER_ERROR)
+            .body(hyper::Body::from(err.to_string()))
+            .unwrap()
+    });
+
+    Ok(res)
+}
+
+async fn handle_inner(
+    config: GatewayConfig,
+    addr: SocketAddr,
+    req: Request<Body>,
+) -> Result<Response<Body>, anyhow::Error> {
     let path = req.uri().path();
 
     if let Some(service_map) = &config.services_map {
@@ -15,13 +35,31 @@ pub async fn request(
             for backend in &service.backends {
                 return match forwarder::hyper::forward(parts, body, &backend).await {
                     Ok(res) => Ok(res),
-                    Err(_) => response::service_unavailable("Failed to connect to downstream service"),
+                    Err(_) => {
+                        let response = hyper::Response::builder()
+                            .status(hyper::StatusCode::NOT_FOUND)
+                            .body(hyper::Body::from("Failed to connect to downstream service".to_string()))
+                            .unwrap();
+                        Ok(response)
+                    }
                 };
             }
         }
     }
 
-    return response::not_found();
+    let response = hyper::Response::builder()
+        .status(hyper::StatusCode::NOT_FOUND)
+        .body(hyper::Body::from("Not Found".to_string()))
+        .unwrap();
+
+    Ok(response)
+
+    // let (parts, body) = req.into_parts();
+    // context
+    //     .runner
+    //     .handle(addr, parts, body)
+    //     .await
+    //     .context("JavaScript failed")
 }
 
 // #[cfg(test)]
