@@ -1,29 +1,25 @@
-use hyper::service::{make_service_fn, service_fn};
-use hyper::{Server};
 use std::net::SocketAddr;
+
 use herpy::config::config::{GatewayConfig, load_config};
-use herpy::gateway;
 
 #[tokio::main]
 async fn main() {
-    let config: GatewayConfig = load_config("config.yaml");
-
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
-
-    let make_svc = make_service_fn(move |_conn| {
-        let config: GatewayConfig = config.clone();
-
-        async {
-            Ok::<_, hyper::Error>(service_fn(move |req| {
-                let config: GatewayConfig = config.clone();
-                gateway::handler::handle_request(req, config)
-            }))
-        }
-    });
-
-    let server = Server::bind(&addr).serve(make_svc);
-
-    if let Err(e) = server.await {
-        eprintln!("server error: {}", e);
+    if let Err(e) = run().await {
+        println!("{e:?}");
     }
+}
+
+async fn run() -> Result<(), anyhow::Error> {
+    // Initialize logging.
+    if std::env::var("RUST_LOG").is_err() {
+        // Set default log level.
+        std::env::set_var("RUST_LOG", "herpy=info,warn");
+    }
+    tracing_subscriber::fmt::init();
+
+    let config: GatewayConfig = load_config("herpy.yaml");
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], config.port.clone()));
+
+    herpy::server::run_server(config, addr).await
 }

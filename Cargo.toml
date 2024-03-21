@@ -11,3 +11,7 @@ serde_yaml = "0.9.19"
 tokio = { version = "1.16.1", features = ["full"] }
 hyper = { version = "0.14.10", features = ["full"] }
 reqwest = { version = "0.11", features = ["json"] }
+anyhow = "1.0.81"
+futures = "0.3.28"
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.17", features = ["env-filter", "fmt"] }

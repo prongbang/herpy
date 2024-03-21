@@ -1,0 +1,27 @@
+---
+port: 8080
+authorization:
+  authorize_token:
+    host: "https://httpbin.org"
+    path: "/post"
+    method: POST
+services:
+  - endpoint: "/users"
+    method: POST
+    backends:
+      - host: "https://jsonplaceholder.typicode.com"
+        path: "/users"
+        method: GET
+        authorization: authorize_token
+  - endpoint: "/posts"
+    method: POST
+    backends:
+      - host: "https://httpbin.org"
+        path: "/post"
+        method: POST
+  - endpoint: "/hello"
+    method: POST
+    backends:
+      - host: "http://localhost:8000"
+        path: "/v1/hello"
+        method: POST
