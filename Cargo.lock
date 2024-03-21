@@ -305,6 +305,7 @@ dependencies = [
  "anyhow",
  "futures",
  "hyper",
+ "hyper-tls",
  "reqwest",
  "serde",
  "serde_yaml",

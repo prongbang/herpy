@@ -1,6 +1,8 @@
 use hyper::http::request::Parts;
 use crate::config::config::Backend;
-use hyper::{Body, Client, Request, Response};
+use hyper::{Body, Request, Response};
+use hyper::client::HttpConnector;
+use hyper_tls::HttpsConnector;
 
 async fn build_request(
     parts: Parts,
@@ -17,9 +19,9 @@ async fn build_request(
 
     *builder.headers_mut().unwrap() = req.headers().clone();
 
-    let body_bytes = hyper::body::to_bytes(req.into_body()).await?;
-
-    let downstream_req = builder.body(Body::from(body_bytes));
+    // let body_bytes = hyper::body::to_bytes(req.into_body()).await?;
+    // let downstream_req = builder.body(Body::from(body_bytes));
+    let downstream_req = builder.body(req.into_body());
 
     Ok(downstream_req.unwrap())
 }
@@ -27,14 +29,10 @@ async fn build_request(
 pub async fn forward(
     parts: Parts,
     body: Body,
+    client: &hyper::Client<HttpsConnector<HttpConnector>>,
     backend: &Backend,
-) -> Result<Response<Body>, ()> {
-    let req = build_request(parts, body, backend);
-    if let Ok(req) = req.await {
-        return match Client::new().request(req).await {
-            Ok(res) => Ok(res),
-            Err(_) => Err(()),
-        };
-    }
-    return Err(());
+) -> Result<Response<Body>, hyper::Error> {
+    let req = build_request(parts, body, backend).await?;
+    let res = client.request(req).await?;
+    Ok(res)
 }

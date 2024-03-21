@@ -1,14 +1,18 @@
 use std::convert::Infallible;
+use std::sync::Arc;
 use hyper::{Body, Request, Response};
+use hyper::client::HttpConnector;
+use hyper_tls::HttpsConnector;
 
 use crate::{forwarder};
 use crate::config::config::GatewayConfig;
 
 pub async fn request(
-    config: GatewayConfig,
     req: Request<Body>,
+    config: GatewayConfig,
+    client: Arc<hyper::Client<HttpsConnector<HttpConnector>>>,
 ) -> Result<Response<Body>, Infallible> {
-    let res = handle_inner(config, req).await.unwrap_or_else(|err| {
+    let res = handle_inner(req, config, client).await.unwrap_or_else(|err| {
         tracing::error!(error = format!("{err:#?}"), "could not process request");
 
         hyper::Response::builder()
@@ -21,8 +25,9 @@ pub async fn request(
 }
 
 async fn handle_inner(
-    config: GatewayConfig,
     req: Request<Body>,
+    config: GatewayConfig,
+    client: Arc<hyper::Client<HttpsConnector<HttpConnector>>>,
 ) -> Result<Response<Body>, anyhow::Error> {
     let path = req.uri().path();
 
@@ -30,7 +35,7 @@ async fn handle_inner(
         if let Some(service) = service_map.get(path) {
             let (parts, body) = req.into_parts();
             for backend in &service.backends {
-                return match forwarder::hyper::forward(parts, body, &backend).await {
+                return match forwarder::hyper::forward(parts, body, &client, &backend).await {
                     Ok(res) => Ok(res),
                     Err(_) => {
                         let response = hyper::Response::builder()
