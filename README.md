@@ -10,12 +10,31 @@ Herpy API Gateway write in Rust
 
 ```yaml
 ---
-authorization_api_url: "http://auth-service/posts/1"
+---
+port: 8080
+authorization:
+  authorize_token:
+    host: "https://httpbin.org"
+    path: "/post"
+    method: POST
 services:
-  - path: "/users"
-    target_service: "http://user-service/users"
-    target_port: "80"
-  - path: "/orders"
-    target_service: "http://order-service/posts"
-    target_port: "80"
+  - endpoint: "/users"
+    method: POST
+    backends:
+      - host: "https://jsonplaceholder.typicode.com"
+        path: "/users"
+        method: GET
+        authorization: authorize_token
+  - endpoint: "/posts"
+    method: POST
+    backends:
+      - host: "https://httpbin.org"
+        path: "/post"
+        method: POST
+  - endpoint: "/hello"
+    method: POST
+    backends:
+      - host: "http://localhost:8000"
+        path: "/v1/hello"
+        method: POST
 ```
