@@ -16,8 +16,7 @@ pub async fn run_server(
     config: GatewayConfig,
     addr: SocketAddr,
 ) -> Result<(), anyhow::Error> {
-    let https = HttpsConnector::new();
-    let client = hyper::Client::builder().build::<_, hyper::Body>(https);
+    let client = reqwest::Client::new();
     let client = Arc::new(client);
 
     let make_service = make_service_fn(move |_: &AddrStream| {

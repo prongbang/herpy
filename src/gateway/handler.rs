@@ -10,7 +10,7 @@ use crate::config::config::GatewayConfig;
 pub async fn request(
     req: Request<Body>,
     config: GatewayConfig,
-    client: Arc<hyper::Client<HttpsConnector<HttpConnector>>>,
+    client: Arc<reqwest::Client>,
 ) -> Result<Response<Body>, Infallible> {
     let res = handle_inner(req, config, client).await.unwrap_or_else(|err| {
         tracing::error!(error = format!("{err:#?}"), "could not process request");
@@ -27,7 +27,7 @@ pub async fn request(
 async fn handle_inner(
     req: Request<Body>,
     config: GatewayConfig,
-    client: Arc<hyper::Client<HttpsConnector<HttpConnector>>>,
+    client: Arc<reqwest::Client>,
 ) -> Result<Response<Body>, anyhow::Error> {
     let path = req.uri().path();
 
@@ -35,7 +35,7 @@ async fn handle_inner(
         if let Some(service) = service_map.get(path) {
             let (parts, body) = req.into_parts();
             for backend in &service.backends {
-                return match forwarder::hyper::forward(parts, body, &client, &backend).await {
+                return match forwarder::reqwest::forward(parts, body, &client, &backend).await {
                     Ok(res) => Ok(res),
                     Err(_) => {
                         let response = hyper::Response::builder()
@@ -44,7 +44,7 @@ async fn handle_inner(
                             .unwrap();
                         Ok(response)
                     }
-                };
+                }
             }
         }
     }
