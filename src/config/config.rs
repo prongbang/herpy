@@ -6,7 +6,7 @@ use std::collections::HashMap;
 #[serde(rename_all = "camelCase")]
 pub struct GatewayConfig {
     pub port: u16,
-    pub authorization: HashMap<String, Authorization>,
+    pub authorization: Option<HashMap<String, Authorization>>,
     pub services: Vec<Service>,
     pub services_map: Option<HashMap<String, Service>>,
 }

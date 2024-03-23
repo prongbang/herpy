@@ -1,9 +1,0 @@
----
-authorization_api_url: "https://auth-service.local/authorization"
-services:
-  - path: "/users"
-    target_service: "https://user-service.local/users"
-    target_port: "8080"
-  - path: "/orders"
-    target_service: "https://order-service.local/orders"
-    target_port: "8080"

@@ -32,11 +32,6 @@ rewrk -h http://127.0.0.1:8080/hello -t 12 -c 100 -d 60s
 
 ```yaml
 port: 8080
-authorization:
-  authorize_token:
-    host: "https://httpbin.org"
-    path: "/post"
-    method: POST
 services:
   - endpoint: "/users"
     method: POST
@@ -44,7 +39,6 @@ services:
       - host: "https://jsonplaceholder.typicode.com"
         path: "/users"
         method: GET
-        authorization: authorize_token
   - endpoint: "/posts"
     method: POST
     backends:
