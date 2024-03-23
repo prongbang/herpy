@@ -8,10 +8,18 @@ Herpy API Gateway write in Rust
 
 ## Install
 
+- Install with Homebrew
+
 ```shell
 brew update
 brew tap prongbang/homebrew-formulae
 brew install herpy
+```
+
+- Install with Cargo
+
+```shell
+cargo install server --git https://github.com/prongbang/herpy.git
 ```
 
 ## Benchmark
