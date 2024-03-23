@@ -1,8 +1,6 @@
 use std::convert::Infallible;
 use std::sync::Arc;
 use hyper::{Body, Request, Response};
-use hyper::client::HttpConnector;
-use hyper_tls::HttpsConnector;
 
 use crate::{forwarder};
 use crate::config::config::GatewayConfig;
@@ -12,7 +10,7 @@ pub async fn request(
     config: GatewayConfig,
     client: Arc<reqwest::Client>,
 ) -> Result<Response<Body>, Infallible> {
-    let res = handle_inner(req, config, client).await.unwrap_or_else(|err| {
+    let res = handle_inner(req, &config, client).await.unwrap_or_else(|err| {
         tracing::error!(error = format!("{err:#?}"), "could not process request");
 
         hyper::Response::builder()
@@ -26,7 +24,7 @@ pub async fn request(
 
 async fn handle_inner(
     req: Request<Body>,
-    config: GatewayConfig,
+    config: &GatewayConfig,
     client: Arc<reqwest::Client>,
 ) -> Result<Response<Body>, anyhow::Error> {
     let path = req.uri().path();

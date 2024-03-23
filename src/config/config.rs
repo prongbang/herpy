@@ -61,20 +61,9 @@ mod tests {
 
     #[test]
     fn test_load_config() {
-        let path = "config.test.yaml";
+        let path = "herpy.yaml";
         let config = load_config(path);
 
-        // assert_eq!(config.authorization_api_url, "https://auth-service.local/authorization");
-        // assert_eq!(config.services.len(), 2);
-        //
-        // let service1 = &config.services[0];
-        // assert_eq!(service1.path, "/users");
-        // assert_eq!(service1.target_service, "https://user-service.local/users");
-        // assert_eq!(service1.target_port, "8080");
-        //
-        // let service2 = &config.services[1];
-        // assert_eq!(service2.path, "/orders");
-        // assert_eq!(service2.target_service, "https://order-service.local/orders");
-        // assert_eq!(service2.target_port, "8080");
+        assert_eq!(config.services.len(), 3);
     }
 }

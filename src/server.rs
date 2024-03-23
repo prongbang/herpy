@@ -8,7 +8,6 @@ use anyhow::Context as _;
 use hyper::server::conn::AddrStream;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Server};
-use hyper_tls::HttpsConnector;
 use crate::config::config::GatewayConfig;
 use crate::gateway;
 
