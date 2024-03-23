@@ -6,6 +6,14 @@ Herpy API Gateway write in Rust
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/prongbang)
 
+## Install
+
+```shell
+brew update
+brew tap prongbang/homebrew-formulae
+brew install herpy
+```
+
 ## Benchmark
 
 - MacBook Pro (14-inch, 2021)
