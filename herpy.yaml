@@ -20,8 +20,8 @@ services:
         path: "/post"
         method: POST
   - endpoint: "/hello"
-    method: POST
+    method: GET
     backends:
       - host: "http://localhost:8000"
         path: "/v1/hello"
-        method: POST
+        method: GET

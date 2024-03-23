@@ -22,10 +22,13 @@ pub async fn forward(
 
     match response.await {
         Ok(res) => {
-            let resp = Response::builder()
+            let headers = res.headers().clone();
+            let mut resp = Response::builder()
                 .status(res.status())
                 .body(Body::from(res.bytes().await.unwrap()))
                 .unwrap();
+            *resp.headers_mut() = headers;
+
             Ok(resp)
         }
         _ => Err(()),
