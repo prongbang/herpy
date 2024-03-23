@@ -1,5 +1,7 @@
 use std::str::FromStr;
+use std::time::Duration;
 use hyper::{Body, Response};
+use hyper::body::Bytes;
 use hyper::http::request::Parts;
 use reqwest::{Method};
 use crate::config::config::Backend;
@@ -15,6 +17,7 @@ pub async fn forward(
     let method = Method::from_str(&backend.method.as_str()).unwrap();
     let request = client
         .request(method, uri)
+        .timeout(Duration::from_secs(backend.timeout.unwrap_or(30)))
         .headers(parts.headers)
         .body(body);
 
@@ -25,7 +28,7 @@ pub async fn forward(
             let headers = res.headers().clone();
             let mut resp = Response::builder()
                 .status(res.status())
-                .body(Body::from(res.bytes().await.unwrap()))
+                .body(Body::from(res.bytes().await.unwrap_or(Bytes::new())))
                 .unwrap();
             *resp.headers_mut() = headers;
 

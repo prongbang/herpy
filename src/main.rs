@@ -1,4 +1,5 @@
 use std::net::SocketAddr;
+use std::sync::Arc;
 
 use herpy::config::config::{GatewayConfig, load_config};
 
@@ -18,8 +19,12 @@ async fn run() -> Result<(), anyhow::Error> {
     tracing_subscriber::fmt::init();
 
     let config: GatewayConfig = load_config("herpy.yaml");
+    let client = reqwest::Client::new();
+
+    let client = Arc::new(client);
+    let config = Arc::new(config);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port.clone()));
 
-    herpy::server::run_server(config, addr).await
+    herpy::server::run_server(config, client, addr).await
 }

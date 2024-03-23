@@ -12,6 +12,7 @@ services:
       - host: "https://jsonplaceholder.typicode.com"
         path: "/users"
         method: GET
+        timeout: 30
         authorization: authorize_token
   - endpoint: "/posts"
     method: POST
@@ -19,9 +20,11 @@ services:
       - host: "https://httpbin.org"
         path: "/post"
         method: POST
+        timeout: 30
   - endpoint: "/hello"
     method: GET
     backends:
       - host: "http://localhost:8000"
         path: "/v1/hello"
         method: GET
+        timeout: 30

@@ -33,6 +33,7 @@ pub struct Backend {
     pub host: String,
     pub path: String,
     pub method: String,
+    pub timeout: Option<u64>,
     pub authorization: Option<String>,
 }
 

@@ -8,23 +8,22 @@ use anyhow::Context as _;
 use hyper::server::conn::AddrStream;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Server};
+use reqwest::Client;
 use crate::config::config::GatewayConfig;
 use crate::gateway;
 
 pub async fn run_server(
-    config: GatewayConfig,
+    config: Arc<GatewayConfig>,
+    client: Arc<Client>,
     addr: SocketAddr,
 ) -> Result<(), anyhow::Error> {
-    let client = reqwest::Client::new();
-    let client = Arc::new(client);
-
     let make_service = make_service_fn(move |_: &AddrStream| {
-        let config = config.clone();
+        let config = Arc::clone(&config);
         let client = Arc::clone(&client);
 
         // Create a `Service` for responding to the request.
         let service = service_fn(move |req|
-            gateway::handler::request(req, config.clone(), Arc::clone(&client))
+            gateway::handler::request(req, Arc::clone(&config), Arc::clone(&client))
         );
 
         // Return the service to hyper.
