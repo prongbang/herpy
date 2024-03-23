@@ -1,9 +1,10 @@
 use std::convert::Infallible;
 use std::sync::Arc;
+
 use hyper::{Body, Request, Response};
 
-use crate::{forwarder};
 use crate::config::config::GatewayConfig;
+use crate::forwarder;
 
 pub async fn request(
     req: Request<Body>,
