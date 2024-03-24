@@ -19,6 +19,7 @@ pub async fn forward(
         .request(method, uri)
         .timeout(Duration::from_secs(backend.timeout.unwrap_or(30)))
         .headers(parts.headers)
+        .version(parts.version)
         .body(body);
 
     let response = request.send();

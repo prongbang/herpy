@@ -1,10 +1,10 @@
 use std::convert::Infallible;
 use std::sync::Arc;
 
-use hyper::{Body, Request, Response};
+use hyper::{Body, Request, Response, StatusCode};
 
 use crate::config::config::GatewayConfig;
-use crate::forwarder;
+use crate::{forwarder, response};
 
 pub async fn request(
     req: Request<Body>,
@@ -15,7 +15,7 @@ pub async fn request(
         tracing::error!(error = format!("{err:#?}"), "could not process request");
 
         hyper::Response::builder()
-            .status(hyper::StatusCode::INTERNAL_SERVER_ERROR)
+            .status(StatusCode::BAD_GATEWAY)
             .body(hyper::Body::from(err.to_string()))
             .unwrap()
     });
@@ -36,24 +36,13 @@ async fn handle_inner(
             for backend in &service.backends {
                 return match forwarder::reqwest::forward(parts, body, client, &backend).await {
                     Ok(res) => Ok(res),
-                    Err(_) => {
-                        let response = hyper::Response::builder()
-                            .status(hyper::StatusCode::NOT_FOUND)
-                            .body(hyper::Body::from("Failed to connect to downstream service".to_string()))
-                            .unwrap();
-                        Ok(response)
-                    }
-                }
+                    Err(_) => Ok(response::bad_gateway())
+                };
             }
         }
     }
 
-    let response = hyper::Response::builder()
-        .status(hyper::StatusCode::NOT_FOUND)
-        .body(hyper::Body::from("Not Found".to_string()))
-        .unwrap();
-
-    Ok(response)
+    Ok(response::not_found())
 }
 
 // #[cfg(test)]
