@@ -68,3 +68,13 @@ services:
         path: "/v1/hello"
         method: POST
 ```
+
+## Run
+
+```shell
+herpy
+```
+
+```shell
+2024-03-23T16:20:32.967967Z  INFO herpy::server: starting server on '0.0.0.0:8080' listen=0.0.0.0:8080
+```
