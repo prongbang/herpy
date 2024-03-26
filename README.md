@@ -19,7 +19,7 @@ brew install herpy
 - Install with Cargo
 
 ```shell
-cargo install server --git https://github.com/prongbang/herpy.git
+cargo install herpy --git https://github.com/prongbang/herpy.git
 ```
 
 ## Benchmark
