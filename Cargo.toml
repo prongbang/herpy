@@ -3,6 +3,13 @@ name = "herpy"
 version = "0.1.0"
 edition = "2021"
 
+[profile.release]
+# Enable Link-Time Optimization (LTO)
+lto = true
+# Enable Compiler Optimizations
+opt-level = 3
+codegen-units = 16
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
