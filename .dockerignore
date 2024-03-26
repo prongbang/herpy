@@ -1,0 +1,8 @@
+.github/
+target/
+.gitignore
+.travis.yml
+herpy.yaml
+Makefile
+README.md
+docker-compose.yml

@@ -43,6 +43,12 @@ zip_file:
 	tar -zcvf $(version)_$(target).tar.gz herpy && \
 	cd ../../../
 
+build_image:
+	docker build -t prongbang/herpy:latest .
+
+run_container:
+	docker run -d -p 8080:8080 --name herpy-api-gateway prongbang/herpy:latest
+
 # make build_macos_release version=0.1.0
 build_macos_release:
 	make build_macos version=0.1.0

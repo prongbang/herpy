@@ -1,29 +1,37 @@
-FROM --platform=linux/arm64 rust:1.69 as builder
+# Create a stage for building the application.
+ARG RUST_VERSION=1.77.0
+ARG APP_NAME=herpy
 
-RUN echo Building on linux/arm64
-
-# Check if we are doing cross-compilation, if so we need to add in some more dependencies and run rustup
-RUN apt-get update && apt-get install --no-install-recommends -y g++-aarch64-linux-gnu libc6-dev-arm64-cross libprotobuf-dev protobuf-compiler ca-certificates && \
-    rustup target add aarch64-unknown-linux-gnu && \
-    rustup toolchain install stable-aarch64-unknown-linux-gnu; \
-
-WORKDIR /app/
-
-COPY /src/shippingservice/ /app/
-COPY /pb/ /app/proto/
-
-# Compile or crosscompile
-RUN env CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc \
-        CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc \
-        CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++ \
-    cargo build --target aarch64-unknown-linux-gnu && \
-    cp /app/target/aarch64-unknown-linux-gnu/release/herpy /app/target/release/herpy; \
-
-
-FROM debian:bullseye-slim as release
+FROM rust:${RUST_VERSION}-slim-bullseye AS build
+ARG APP_NAME
 
 WORKDIR /app
-COPY --from=builder /app/target/release/herpy /app/herpy
+COPY . .
 
+RUN apt update && apt install --yes binutils build-essential pkg-config libssl-dev clang lld git
+
+# Build the application
+RUN cargo build --locked --release
+RUN cp ./target/release/$APP_NAME /bin/herpy
+
+FROM debian:bullseye-slim AS final
+
+ARG UID=10001
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    appuser
+USER appuser
+
+# Copy the executable from the "build" stage.
+COPY --from=build /bin/herpy /bin/herpy
+
+# Expose the port that the application listens on.
 EXPOSE 8080
-ENTRYPOINT ["/app/herpy"]
+
+# What the container should run when it is started.
+ENTRYPOINT ["/bin/herpy"]
