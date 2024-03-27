@@ -53,6 +53,11 @@ run_container:
 		--name herpy-api-gateway \
 		prongbang/herpy:latest
 
+# make push_image tag=latest
+push_image:
+	docker tag prongbang/herpy:$(tag) prongbang/herpy:$(tag)
+	docker push prongbang/herpy:$(tag)
+
 # make build_macos_release version=0.1.0
 build_macos_release:
 	make build_macos version=0.1.0
