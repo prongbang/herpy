@@ -47,7 +47,11 @@ build_image:
 	docker build -t prongbang/herpy:latest .
 
 run_container:
-	docker run -d -p 8080:8080 --name herpy-api-gateway prongbang/herpy:latest
+	docker run \
+		-p 8080:8080 \
+		-v "./herpy.yaml:/etc/herpy/herpy.yaml" \
+		--name herpy-api-gateway \
+		prongbang/herpy:latest
 
 # make build_macos_release version=0.1.0
 build_macos_release:

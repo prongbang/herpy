@@ -1,4 +1,4 @@
----
+version: "1"
 port: 8080
 authorization:
   authorize_token:
@@ -9,8 +9,8 @@ services:
   - endpoint: "/users"
     method: POST
     backends:
-      - host: "https://jsonplaceholder.typicode.com"
-        path: "/users"
+      - host: "https://httpbin.org"
+        path: "/get"
         method: GET
         timeout: 30
         authorization: authorize_token

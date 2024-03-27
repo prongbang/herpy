@@ -4,7 +4,7 @@ use hyper::{Body, Response};
 use hyper::body::Bytes;
 use hyper::http::request::Parts;
 use reqwest::{Method};
-use crate::config::config::Backend;
+use crate::config::Backend;
 
 pub async fn forward(
     parts: Parts,
@@ -35,6 +35,9 @@ pub async fn forward(
 
             Ok(resp)
         }
-        _ => Err(()),
+        Err(e) => {
+            println!("[Herpy] {:?}", e);
+            Err(())
+        }
     }
 }

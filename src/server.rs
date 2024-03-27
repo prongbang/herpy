@@ -9,7 +9,7 @@ use hyper::server::conn::AddrStream;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Server};
 use reqwest::Client;
-use crate::config::config::GatewayConfig;
+use crate::config::GatewayConfig;
 use crate::gateway;
 
 pub async fn run_server(

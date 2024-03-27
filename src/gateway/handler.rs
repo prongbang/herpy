@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use hyper::{Body, Request, Response, StatusCode};
 
-use crate::config::config::GatewayConfig;
+use crate::config::GatewayConfig;
 use crate::{forwarder, response};
 
 pub async fn request(

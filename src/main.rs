@@ -1,7 +1,8 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
+use clap::Parser;
 
-use herpy::config::config::{GatewayConfig, load_config};
+use herpy::config::{Args, GatewayConfig};
 
 #[tokio::main]
 async fn main() {
@@ -18,11 +19,12 @@ async fn run() -> Result<(), anyhow::Error> {
     }
     tracing_subscriber::fmt::init();
 
-    let config: GatewayConfig = load_config("herpy.yaml");
-    let client = reqwest::Client::new();
-
-    let client = Arc::new(client);
+    let args = Args::parse();
+    let config: GatewayConfig = herpy::config::load(args);
     let config = Arc::new(config);
+
+    let client = reqwest::Client::new();
+    let client = Arc::new(client);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port.clone()));
 

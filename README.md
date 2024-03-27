@@ -22,6 +22,12 @@ brew install herpy
 cargo install server --git https://github.com/prongbang/herpy.git
 ```
 
+- Install with Docker
+
+```shell
+docker run -d -p 8080:8080 -v "./herpy.yaml:/etc/herpy/herpy.yaml" --name herpy-api-gateway prongbang/herpy:latest
+```
+
 ## Benchmark
 
 - MacBook Pro (14-inch, 2021)
@@ -47,6 +53,7 @@ rewrk -h http://127.0.0.1:8080/hello -t 12 -c 100 -d 60s
 - herpy.yaml
 
 ```yaml
+version: "1"
 port: 8080
 services:
   - endpoint: "/users"
@@ -72,7 +79,7 @@ services:
 ## Run
 
 ```shell
-herpy
+herpy -c herpy.yaml
 ```
 
 ```shell
