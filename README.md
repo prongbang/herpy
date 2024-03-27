@@ -25,7 +25,7 @@ cargo install server --git https://github.com/prongbang/herpy.git
 - Install with Docker
 
 ```shell
-docker run -d -p 8080:8080 -v "./herpy.yaml:/etc/herpy/herpy.yaml" --name herpy-api-gateway prongbang/herpy:latest
+docker pull prongbang/herpy:latest
 ```
 
 ## Benchmark
@@ -78,9 +78,23 @@ services:
 
 ## Run
 
+- Native
+
 ```shell
 herpy -c herpy.yaml
 ```
+
+- Docker
+
+```shell
+docker run \
+    -p 8080:8080 \
+    -v "./herpy.yaml:/etc/herpy/herpy.yaml" \
+    --name herpy-api-gateway \
+    prongbang/herpy:latest
+```
+
+- Listen
 
 ```shell
 2024-03-23T16:20:32.967967Z  INFO herpy::server: starting server on '0.0.0.0:8080' listen=0.0.0.0:8080
