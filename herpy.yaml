@@ -1,5 +1,6 @@
 version: "1"
-port: 8080
+metadata:
+  port: 8080
 authorization:
   authorize_token:
     host: "https://httpbin.org"

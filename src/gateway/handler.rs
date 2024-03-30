@@ -5,6 +5,7 @@ use hyper::{Body, Request, Response, StatusCode};
 
 use crate::config::GatewayConfig;
 use crate::{forwarder, response};
+use crate::gateway::parse_query_string;
 
 pub async fn request(
     req: Request<Body>,
@@ -28,13 +29,15 @@ async fn handle_inner(
     config: &GatewayConfig,
     client: &reqwest::Client,
 ) -> Result<Response<Body>, anyhow::Error> {
-    let path = req.uri().path();
+    let uri = req.uri().clone();
+    let query = parse_query_string(uri.query().unwrap_or(""));
+    let path = uri.path();
 
     if let Some(service_map) = &config.services_map {
         if let Some(service) = service_map.get(path) {
             let (parts, body) = req.into_parts();
             for backend in &service.backends {
-                return match forwarder::reqwest::forward(parts, body, client, &backend).await {
+                return match forwarder::reqwest::forward(parts, body, query, client, &backend).await {
                     Ok(res) => Ok(res),
                     Err(_) => Ok(response::bad_gateway())
                 };

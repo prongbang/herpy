@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::str::FromStr;
 use std::time::Duration;
 use hyper::{Body, Response};
@@ -9,6 +10,7 @@ use crate::config::Backend;
 pub async fn forward(
     parts: Parts,
     body: Body,
+    query: HashMap<String, String>,
     client: &reqwest::Client,
     backend: &Backend,
 ) -> Result<Response<Body>, ()> {
@@ -18,6 +20,7 @@ pub async fn forward(
     let request = client
         .request(method, uri)
         .timeout(Duration::from_secs(backend.timeout.unwrap_or(30)))
+        .query(&query)
         .headers(parts.headers)
         .version(parts.version)
         .body(body);

@@ -71,15 +71,15 @@ build_windows_release:
 	make build_windows version=0.1.0
 
 get_users:
-	curl --location 'http://localhost:8080/users' \
+	curl -X POST -d '{"API-KEY": "789"}' 'http://localhost:8080/users?param=1&q=test' \
     --header 'Authorization: Bearer JWT'
 
-get_orders:
-	curl --location 'http://localhost:8080/orders' \
+get_posts:
+	curl -X POST -d '{"API-KEY": "789"}' 'http://localhost:8080/orders' \
     --header 'Authorization: Bearer JWT'
 
 get_hello:
-	curl -X POST --location 'http://localhost:8080/hello' \
+	curl -X GET --location 'http://localhost:8080/hello' \
     --header 'Authorization: Bearer JWT'
 
 get_hello_krakens:

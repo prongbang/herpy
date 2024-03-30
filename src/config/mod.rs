@@ -13,10 +13,16 @@ pub struct Args {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GatewayConfig {
-    pub port: u16,
+    pub metadata: Metadata,
     pub authorization: Option<HashMap<String, Authorization>>,
     pub services: Vec<Service>,
     pub services_map: Option<HashMap<String, Service>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Metadata {
+    pub port: u16,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

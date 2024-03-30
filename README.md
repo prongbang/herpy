@@ -54,7 +54,8 @@ rewrk -h http://127.0.0.1:8080/hello -t 12 -c 100 -d 60s
 
 ```yaml
 version: "1"
-port: 8080
+metadata:
+  port: 8080
 services:
   - endpoint: "/users"
     method: POST

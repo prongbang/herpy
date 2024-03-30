@@ -26,7 +26,7 @@ async fn run() -> Result<(), anyhow::Error> {
     let client = reqwest::Client::new();
     let client = Arc::new(client);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], config.port.clone()));
+    let addr = SocketAddr::from(([0, 0, 0, 0], config.metadata.port.clone()));
 
     herpy::server::run_server(config, client, addr).await
 }
