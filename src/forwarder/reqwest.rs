@@ -1,28 +1,32 @@
 use std::collections::HashMap;
+use std::io::Read;
 use std::str::FromStr;
 use std::time::Duration;
-use hyper::{Body, Response};
+
+use hyper::{Body, HeaderMap, Response, Version};
 use hyper::body::Bytes;
-use hyper::http::request::Parts;
-use reqwest::{Method};
+use reqwest::Method;
+
 use crate::config::Backend;
 
 pub async fn forward(
-    parts: Parts,
+    headers: HeaderMap,
     body: Body,
     query: HashMap<String, String>,
+    version: Version,
     client: &reqwest::Client,
     backend: &Backend,
 ) -> Result<Response<Body>, ()> {
     let backend_uri = format!("{}{}", &backend.host, &backend.path);
     let uri = reqwest::Url::from_str(backend_uri.as_str()).unwrap();
     let method = Method::from_str(&backend.method.as_str()).unwrap();
+    println!("uri:{}", &uri);
     let request = client
         .request(method, uri)
         .timeout(Duration::from_secs(backend.timeout.unwrap_or(30)))
         .query(&query)
-        .headers(parts.headers)
-        .version(parts.version)
+        .headers(headers)
+        .version(version)
         .body(body);
 
     let response = request.send();

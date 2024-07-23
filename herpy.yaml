@@ -29,3 +29,7 @@ services:
         path: "/v1/hello"
         method: GET
         timeout: 30
+      - host: "http://localhost:8000"
+        path: "/v1/world"
+        method: GET
+        timeout: 30

@@ -2,7 +2,8 @@ use std::convert::Infallible;
 use std::sync::Arc;
 
 use hyper::{Body, Request, Response, StatusCode};
-
+use hyper::body::to_bytes;
+use hyper::http::request::Parts;
 use crate::config::GatewayConfig;
 use crate::{forwarder, response};
 use crate::gateway::parse_query_string;
@@ -35,13 +36,30 @@ async fn handle_inner(
 
     if let Some(service_map) = &config.services_map {
         if let Some(service) = service_map.get(path) {
-            let (parts, body) = req.into_parts();
+            let headers = req.headers().clone();
+            let version = req.version().clone();
+            let body = req.into_parts();
+
+            // Convert the body to bytes
+            let body_bytes = match to_bytes(body.1).await {
+                Ok(bytes) => bytes,
+                Err(_) => return Ok(response::bad_gateway()),
+            };
+
+            let mut resp: Option<Response<Body>> = None;
             for backend in &service.backends {
-                return match forwarder::reqwest::forward(parts, body, query, client, &backend).await {
-                    Ok(res) => Ok(res),
-                    Err(_) => Ok(response::bad_gateway())
-                };
+                let headers = headers.clone();
+                let query = query.clone();
+
+                // Convert bytes to String
+                let body = Body::from(body_bytes.to_vec());
+
+                let res = forwarder::reqwest::forward(headers, body, query, version, client, &backend).await.unwrap_or_else(|_| response::bad_gateway());
+                if resp.is_none() {
+                    resp = Some(res);
+                }
             }
+            return Ok(resp.unwrap());
         }
     }
 
