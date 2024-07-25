@@ -30,9 +30,9 @@ docker pull prongbang/herpy:latest
 
 ## Benchmark
 
-- MacBook Pro (14-inch, 2021)
-- Chip Apple M1 Pro
-- Memory 16 GB
+- Mac Studio 2022
+- Chip Apple M1 Max
+- Memory 32 GB
 
 ```shell
 rewrk -h http://127.0.0.1:8080/hello -t 12 -c 100 -d 60s
@@ -44,9 +44,9 @@ rewrk -h http://127.0.0.1:8080/hello -t 12 -c 100 -d 60s
 
 | Name | Latency.Avg | Latency.Stdev | Latency.Min | Latency.Max | Request.Total | Request.Req/Sec | Transfer.Total | Transfer.Rate |
 |----------------|---|---|---|---|---|---|---|---|
-| Direct         |1.96ms|1.51ms|0.03ms|39.83ms|3053635|50894.22|381.49 MB|6.36 MB/Sec|
-| **Herpy**          |**3.03ms**|**1.88ms**|**0.11ms**|**33.97ms**|**1978253**|**32971.05**|**186.77 MB**|**3.11 MB/Sec**|
-| KrakenD        |3.90ms|1.62ms|0.06ms|65.20ms|1539334|25656.21|344.99 MB|5.75 MB/Sec|
+| Direct         |0.67ms|1.52ms|0.05ms|124.63ms|8890025|148165.69|1.08 GB|18.51 MB/Sec|
+| **Herpy**          |**0.63ms**|**0.19ms**|**0.02ms**|**11.46ms**|**9528463**|**158806.60**|**826.92 MB**|**13.78 MB/Sec**|
+| KrakenD        |1.11ms|0.92ms|0.02ms|48.48ms|5427454|90456.93|936.86 MB|15.61 MB/Sec|
 
 ## Configuration
 
