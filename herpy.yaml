@@ -25,11 +25,11 @@ services:
   - endpoint: "/hello"
     method: GET
     backends:
-      - host: "http://localhost:8000"
-        path: "/v1/hello"
+      - host: "https://wachasit.com"
+        path: "/"
         method: GET
         timeout: 30
-      - host: "http://localhost:8000"
-        path: "/v1/world"
+      - host: "https://httpbin.org"
+        path: "/post"
         method: GET
         timeout: 30

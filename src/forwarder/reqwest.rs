@@ -1,10 +1,10 @@
 use std::collections::HashMap;
-use std::io::Read;
 use std::str::FromStr;
 use std::time::Duration;
 
 use hyper::{Body, HeaderMap, Response, Version};
 use hyper::body::Bytes;
+use hyper::header::HeaderName;
 use reqwest::Method;
 
 use crate::config::Backend;
@@ -20,7 +20,9 @@ pub async fn forward(
     let backend_uri = format!("{}{}", &backend.host, &backend.path);
     let uri = reqwest::Url::from_str(backend_uri.as_str()).unwrap();
     let method = Method::from_str(&backend.method.as_str()).unwrap();
-    println!("uri:{}", &uri);
+    let mut headers = headers;
+    headers.remove(HeaderName::from_static("host"));
+
     let request = client
         .request(method, uri)
         .timeout(Duration::from_secs(backend.timeout.unwrap_or(30)))
@@ -43,7 +45,7 @@ pub async fn forward(
             Ok(resp)
         }
         Err(e) => {
-            println!("[Herpy] {:?}", e);
+            tracing::error!(error = format!("{:?}", e));
             Err(())
         }
     }

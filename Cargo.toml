@@ -15,9 +15,9 @@ codegen-units = 16
 [dependencies]
 serde = { version = "1.0.159", features = ["derive"] }
 serde_yaml = "0.9.19"
-tokio = { version = "1.16.1", features = ["full"] }
-hyper = { version = "0.14.28", features = ["full"] }
-reqwest = { version = "0.11.27"}
+tokio = { version = "1.16.1", features = ["macros", "rt-multi-thread"] }
+hyper = { version = "0.14.30", features = ["server"] }
+reqwest = { version = "0.11.27" }
 anyhow = "1.0.81"
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.17", features = ["env-filter", "fmt"] }
