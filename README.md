@@ -75,6 +75,9 @@ services:
       - host: "http://localhost:8000"
         path: "/v1/hello"
         method: POST
+      - host: "http://localhost:8000"
+        path: "/v1/hello"
+        method: POST
 ```
 
 ## Run
