@@ -6,6 +6,13 @@ use crate::config::WAF;
 // - brew install automake
 // - brew install lua
 // - brew install pcre
+// - git clone https://github.com/owasp-modsecurity/ModSecurity
+// - ./build.sh
+// - ./configure
+// - make
+// - sudo make install
+// - installed at /usr/local/modsecurity/lib/pkgconfig/modsecurity.pc
+// - export PKG_CONFIG_PATH=/usr/local/modsecurity/lib/pkgconfig
 pub fn initial(waf: &Option<WAF>) -> Option<Transaction> {
     if let Some(v) = waf {
         if !v.mod_security {
