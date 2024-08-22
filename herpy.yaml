@@ -6,6 +6,8 @@ authorization:
     host: "https://httpbin.org"
     path: "/post"
     method: POST
+waf:
+  mod_security: true
 services:
   - endpoint: "/users"
     method: POST

@@ -355,6 +355,8 @@ dependencies = [
  "anyhow",
  "clap",
  "hyper",
+ "modsecurity",
+ "modsecurity-sys",
  "reqwest",
  "serde",
  "serde_yaml",
@@ -539,6 +541,25 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "modsecurity"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50b4daaabbc0c2d3f12958bc808e8a0b5288b02897c78c1134323f296ebc6bbe"
+dependencies = [
+ "lazy_static",
+ "modsecurity-sys",
+]
+
+[[package]]
+name = "modsecurity-sys"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2ff4f1a5f76a1e95d3ae42a68b4a5d867f46d78f2530804ee1848befb9e15e94"
+dependencies = [
+ "pkg-config",
 ]
 
 [[package]]

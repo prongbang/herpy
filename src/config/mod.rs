@@ -15,6 +15,7 @@ pub struct Args {
 pub struct GatewayConfig {
     pub metadata: Metadata,
     pub authorization: Option<HashMap<String, Authorization>>,
+    pub waf: Option<WAF>,
     pub services: Vec<Service>,
     pub services_map: Option<HashMap<String, Service>>,
 }
@@ -23,6 +24,12 @@ pub struct GatewayConfig {
 #[serde(rename_all = "camelCase")]
 pub struct Metadata {
     pub port: u16,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WAF {
+    pub mod_security: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
