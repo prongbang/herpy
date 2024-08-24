@@ -24,6 +24,13 @@ services:
         path: "/post"
         method: POST
         timeout: 30
+  - endpoint: "/example/admin"
+    method: GET
+    backends:
+      - host: "http://example.com"
+        path: "/admin"
+        method: GET
+        timeout: 30
   - endpoint: "/hello"
     method: GET
     backends:

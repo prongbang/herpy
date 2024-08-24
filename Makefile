@@ -86,3 +86,6 @@ get_hello:
 
 get_hello_krakens:
 	curl -X GET --location 'http://localhost:8090/users'
+
+get_admin_waf:
+	curl -X GET --location 'http://localhost:8080/example/admin?q="><script>alert(1)</script>'

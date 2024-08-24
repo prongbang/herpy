@@ -27,7 +27,6 @@ pub struct Metadata {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct WAF {
     pub mod_security: bool,
 }

@@ -25,12 +25,13 @@ async fn run() -> Result<(), anyhow::Error> {
     let config = Arc::new(config);
 
     // Mod Security
-    let mod_tx = modsec::initial(&config.waf);
+    let mod_config = modsec::initial(&config.waf);
+    let mod_config = Arc::new(mod_config);
 
     let client = reqwest::Client::new();
     let client = Arc::new(client);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.metadata.port.clone()));
 
-    herpy::server::run_server(config, mod_tx, client, addr).await
+    herpy::server::run_server(config, mod_config, client, addr).await
 }

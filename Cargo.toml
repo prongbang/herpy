@@ -25,3 +25,5 @@ clap = { version = "4.3.19", features = ["derive"] }
 url = "2.5.0"
 modsecurity = "0.1.4"
 modsecurity-sys = "0.1.2"
+glob = "0.3.1"
+urlencoding = "2.1.3"

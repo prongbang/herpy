@@ -32,6 +32,7 @@ USER appuser
 WORKDIR /etc/herpy
 
 RUN echo 'version: "1"' > /etc/herpy/herpy.yaml
+RUN echo '' > /etc/herpy/modsecurity/.gitkeep
 
 # Copy the executable from the "build" stage.
 COPY --from=build /bin/herpy /bin/herpy
