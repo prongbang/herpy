@@ -2,6 +2,7 @@
 target/
 .gitignore
 .travis.yml
+.DS_Store
 herpy.yaml
 Makefile
 README.md
