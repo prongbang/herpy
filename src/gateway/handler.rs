@@ -30,30 +30,26 @@ async fn handle_inner(
     client: &reqwest::Client,
 ) -> Result<Response<Body>, anyhow::Error> {
     let uri = req.uri().clone();
-    let query = parse_query_string(uri.query().unwrap_or(""));
+    let query = Arc::new(parse_query_string(uri.query().unwrap_or("")));
     let path = uri.path();
 
     if let Some(service_map) = &config.services_map {
         if let Some(service) = service_map.get(path) {
-            let headers = req.headers().clone();
-            let version = req.version().clone();
-            let body = req.into_parts();
+            let headers = Arc::new(req.headers().clone());
+            let version = req.version();
+            let body_bytes = to_bytes(req.into_body()).await?;
 
-            // Convert the body to bytes
-            let body_bytes = match to_bytes(body.1).await {
-                Ok(bytes) => bytes,
-                Err(_) => return Ok(response::bad_gateway()),
-            };
-
+            let is_single = service.backends.len() == 1;
             let mut resp: Option<Response<Body>> = None;
             for backend in &service.backends {
-                let headers = headers.clone();
-                let query = query.clone();
+                let headers = Arc::clone(&headers);
+                let query = Arc::clone(&query);
 
-                // Convert bytes to String
-                let body = Body::from(body_bytes.to_vec());
+                let res = forwarder::reqwest::forward(headers.as_ref().clone(), Body::from(body_bytes.clone()), query.as_ref().clone(), version, client, &backend).await.unwrap_or_else(|_| response::bad_gateway());
+                if is_single {
+                    return Ok(res);
+                }
 
-                let res = forwarder::reqwest::forward(headers, body, query, version, client, &backend).await.unwrap_or_else(|_| response::bad_gateway());
                 if resp.is_none() {
                     resp = Some(res);
                 }
