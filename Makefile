@@ -53,24 +53,24 @@ run_container:
 		--name herpy-api-gateway \
 		prongbang/herpy:latest
 
-# make push_image tag=0.1.3
+# make push_image tag=0.1.4
 push_image:
 	docker build -t prongbang/herpy:latest .
 	docker tag prongbang/herpy:latest prongbang/herpy:$(tag)
 	docker push prongbang/herpy:$(tag)
 	docker push prongbang/herpy:latest
 
-# make build_macos_release version=0.1.3
+# make build_macos_release version=0.1.4
 build_macos_release:
-	make build_macos version=0.1.3
+	make build_macos version=0.1.4
 
-# make build_linux_release version=0.1.3
+# make build_linux_release version=0.1.4
 build_linux_release:
-	make build_linux version=0.1.3
+	make build_linux version=0.1.4
 
-# make build_windows_release version=0.1.3
+# make build_windows_release version=0.1.4
 build_windows_release:
-	make build_windows version=0.1.3
+	make build_windows version=0.1.4
 
 get_users:
 	curl -X POST -d '{"API-KEY": "789"}' 'http://localhost:8080/users?param=1&q=test' \
