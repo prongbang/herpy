@@ -1,0 +1,11 @@
+prefix=/usr/local/modsecurity
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: ModSecurity
+Description: ModSecurity API
+Version: 3.0.13
+Cflags: -I${prefix}/include
+Libs: -L${exec_prefix}/lib -lmodsecurity
+Libs.private: -lcurl -lGeoIP -lmaxminddb  -lxml2 -llmdb -llua -lm -L/opt/homebrew/Cellar/pcre/8.45/lib -lpcre -lpcre  -lyajl

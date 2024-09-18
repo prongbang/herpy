@@ -1,22 +1,11 @@
 use std::convert::Infallible;
 use std::sync::Arc;
 
-use hyper::{Body, Request, Response, StatusCode, Version};
+use hyper::{Body, Request, Response, StatusCode};
 use hyper::body::to_bytes;
 use crate::config::GatewayConfig;
-use crate::{forwarder, modsec, response};
+use crate::{rewriter, modsec, response, middleware};
 use crate::gateway::parse_query_string;
-
-pub fn http_version(version: Version) -> &'static str {
-    match version {
-        Version::HTTP_09 => "0.9",
-        Version::HTTP_10 => "1.0",
-        Version::HTTP_11 => "1.1",
-        Version::HTTP_2 => "2.0",
-        Version::HTTP_3 => "3.0",
-        _ => "Unknown",
-    }
-}
 
 pub async fn request(
     req: Request<Body>,
@@ -47,41 +36,8 @@ async fn handle_inner(
     let path = uri.path();
 
     // ModSecurity WAF
-    if mod_config.enabled {
-        let mut tx = mod_config.mod_security.transaction_builder()
-            .with_rules(&mod_config.rules)
-            .build()
-            .expect("Error building transaction");
-
-        let method = req.method().clone();
-        let version = req.version().clone();
-        let headers = req.headers().clone();
-        for header in headers {
-            if let Some(key) = header.0 {
-                if key.as_str() != "host" {
-                    let value = header.1.to_str().unwrap_or("");
-                    tx.add_request_header(key.as_str(), value).unwrap_or(());
-                }
-            }
-        }
-
-        let url = urlencoding::decode(uri.to_string().as_str()).expect("UTF-8").to_string();
-        _ = tx.process_uri(url.as_str(), method.as_str(), http_version(version));
-        _ = tx.process_request_headers();
-        let intervention = tx.intervention();
-        _ = tx.process_logging();
-        if let Some(it) = intervention {
-            if it.status() >= 300 {
-                let logs = it.log().unwrap_or("");
-                let status = StatusCode::from_u16(it.status() as u16).unwrap();
-                let res = hyper::Response::builder()
-                    .status(status)
-                    .body(hyper::Body::from(status.to_string()))
-                    .unwrap();
-                tracing::error!(error = format!("{:?}", logs));
-                return Ok(res);
-            }
-        }
+    if let Some(res) = middleware::modsec::process(&req, mod_config) {
+        return Ok(res);
     }
 
     // Rewrite
@@ -97,7 +53,7 @@ async fn handle_inner(
                 let headers = Arc::clone(&headers);
                 let query = Arc::clone(&query);
 
-                let res = forwarder::reqwest::forward(headers.as_ref().clone(), Body::from(body_bytes.clone()), query.as_ref().clone(), version, client, &backend).await.unwrap_or_else(|_| response::bad_gateway());
+                let res = rewriter::reqwest::rewrite(headers.as_ref().clone(), Body::from(body_bytes.clone()), query.as_ref().clone(), version, client, &backend).await.unwrap_or_else(|_| response::bad_gateway());
                 if is_single {
                     return Ok(res);
                 }

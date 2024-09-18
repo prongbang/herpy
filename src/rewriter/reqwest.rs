@@ -10,7 +10,7 @@ use reqwest::Url;
 
 use crate::config::Backend;
 
-pub async fn forward(
+pub async fn rewrite(
     mut headers: HeaderMap,
     body: Body,
     query: HashMap<String, String>,

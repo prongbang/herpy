@@ -2,6 +2,7 @@ use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::collections::HashMap;
+use hyper::Version;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -72,6 +73,17 @@ impl GatewayConfig {
             service_map.insert(service.endpoint.clone(), service.clone());
         }
         self.services_map = Some(service_map);
+    }
+}
+
+pub fn http_version(version: Version) -> &'static str {
+    match version {
+        Version::HTTP_09 => "0.9",
+        Version::HTTP_10 => "1.0",
+        Version::HTTP_11 => "1.1",
+        Version::HTTP_2 => "2.0",
+        Version::HTTP_3 => "3.0",
+        _ => "Unknown",
     }
 }
 
